@@ -18,7 +18,5 @@ public class AcquistoDiretto extends Annuncio{
 	public int gettempiconsegna() {
 		return tempiconsegna;
 	}
-	public int getnonso() {
-		return nonso;
-	}
+
 }
