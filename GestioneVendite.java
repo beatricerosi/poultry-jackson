@@ -40,13 +40,10 @@ public class GestioneVendite {
 				}catch (InputMismatchException e) {
 					System.out.println("Formato non valido.");
 					System.out.println("Inserisci un nuovo prezzo.");
-					System.out.println("Usare la virgola per dividere le unità dai decimali");	
+					System.out.println("Usare la virgola per dividere le unità dai decimali");
+					input.next();
 				}
 				}while (control);
-				
-				// mi serve per mangiarmi lo spazio successivo
-				//altrimenti input.nextLine() successivo mi mangia lo spazio e viene skippato
-				input.nextLine();
 				
 				//in questo punto sto gestendo l'inserimento della data
 				//con SimpleDateFormat sto impostando il nuovo formato possibile di data da inserire
