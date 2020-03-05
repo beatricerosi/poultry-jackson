@@ -28,7 +28,6 @@ public class GestioneVendite {
 				double prezzoiniziale=0.0;
 				//gestisco l'eccezione dell'inserimento di un prezzo decimale
 				
-				//qua ho problemi con il ciclo che mi ripete in continuazione la stampa
 				do {
 				try {
 					
@@ -53,29 +52,33 @@ public class GestioneVendite {
 				
 				boolean controllo=true;
 				Date datagiusta=null;
-				
 				do {
-				try {
-					System.out.println("Inserisci una data di scadenza in formato dd-MM-yyyy: ");
-					SimpleDateFormat newformat = new SimpleDateFormat ("dd-MM-yyyy"); 
-					String datascadenza=input.nextLine();
-					datagiusta=newformat.parse(datascadenza);
-					System.out.println("la data inserita è: " + datagiusta);
-					controllo=false;
+					try {
+						System.out.println("Inserisci una data di scadenza in formato dd-MM-yyyy: ");
+						SimpleDateFormat newformat = new SimpleDateFormat ("dd-MM-yyyy"); 
+						String datascadenza=input.next();
+						datagiusta=newformat.parse(datascadenza);
+						boolean before = now.before(datagiusta);
+						if (before) {
+							System.out.println("la data inserita è: " + datagiusta);
+							controllo=false;
+						}else {
+							System.out.println("La data di scadenza deve essere superiore a quella attuale");
+						}
+					}catch (ParseException e) {
+						System.out.println("impossibile ricavare una data valida dal formato inserito");
+					}
+					}while (controllo);
 					
-				}catch (ParseException e) {
-					System.out.println("impossibile ricavare una data valida dal formato inserito");
+					System.out.println("Inserisci il nome dell'ultimo offerente");
+					String ultimoofferente= input.nextLine();
+					input.nextLine();
+					
+					nuovoannuncio= new AstaRialzo(descrizione, now, prezzoiniziale, datagiusta, ultimoofferente);
+					// bisogna aggiungere l'oggetto al vettore
+					v.add(nuovoannuncio);
+					System.out.println("Hai creato un nuovo annuncio");
 				}
-				}while (controllo);
-				
-				System.out.println("Inserisci il nome dell'ultimo offerente");
-				String ultimoofferente= input.nextLine();
-				
-				nuovoannuncio= new AstaRialzo(descrizione, now, prezzoiniziale, datagiusta, ultimoofferente);
-				// bisogna aggiungere l'oggetto al vettore
-				v.add(nuovoannuncio);
-				System.out.println("Hai creato un nuovo annuncio");
-			}
 			else if (scelta=='D') {
 				
 				flag=false;
@@ -102,7 +105,7 @@ public class GestioneVendite {
 	public void visualizza() {
 		for (Annuncio x : v) {
 		System.out.println(x);
-		System.out.printl();
+		System.out.println();
 		}
 	}
 }
