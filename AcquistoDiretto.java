@@ -1,8 +1,10 @@
 package annunci;
-
 import java.util.*;
 
 public class AcquistoDiretto extends Annuncio{
+
+		// variabile statica richiesta da Serializable
+		static final long serialVersionUID = 1;
 	
 	private double prezzo;
 	private int tempiconsegna;
@@ -22,7 +24,7 @@ public class AcquistoDiretto extends Annuncio{
 	}
 	//overriding dei metodi toString per una visualizzazione adeguata
 	public String toString() {
-		return "Categoria: acquisto diretto. " + ". Prodotto: " + descrizione+ ". Prezzo: "+ prezzo + ". Per la consegna servono: " + tempiconsegna + " giorni.";
+		return "Categoria: Acquisto diretto. " + "Prodotto: " + descrizione+ ". Prezzo: "+ prezzo + ". Per la consegna servono: " + tempiconsegna + " giorni.";
 	}
 
 }
