@@ -17,7 +17,7 @@ public class GestioneVendite {
 		try {
 		ObjectInputStream file_input = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Annuncio.dat")));
 		// legge l'intero vettore da file
-		v = (Vector<Annuncio>) file_input.readObject();
+		v = ((Vector<Annuncio>) file_input.readObject());
 		file_input.close();
 	} catch (FileNotFoundException e) {
 		// gestisce il caso in cui il file non sia presente
@@ -42,7 +42,7 @@ public class GestioneVendite {
 			System.out.println("Vuoi aggiungere un'asta al rialzo [R] o un acquisto diretto?[D]");
 			try {
 				char scelta=input.next().charAt(0);
-				if (scelta=='R') {
+				if (scelta=='R'||scelta=='r') {
 					flag=false;
 					boolean control=true;
 					//fino a che l'utente non inserisce il prezzo, l'oggetto viene memorizzato con prezz=0.0
@@ -80,6 +80,7 @@ public class GestioneVendite {
 					SimpleDateFormat newformat = new SimpleDateFormat ("dd-MM-yyyy");
 					String datascadenza=input.next();
 					datagiusta=newformat.parse(datascadenza);
+				
 					if  (now.after(datagiusta)) throw new EccezioneData("Data invalida: La data di scadenza deve essere posteriore a quella attuale");
 					else controllo=false;
 					} catch (EccezioneData e) {
@@ -101,19 +102,42 @@ public class GestioneVendite {
 				System.out.println("");
 				}
 				//gestisco la scelta dell'utente di inserire un annuncio di AcquistoDiretto
-		else if (scelta=='D') {
+		else if (scelta=='D'||scelta=='d') {
 			
 			flag=false;
 			//gestisci l'eccezione del prezzo
 			System.out.println("Inserisci un prezzo:");
-			double prezzo=input.nextDouble();
+			boolean controllo=true;
+			double prezzo=0.0;
+			do {
+			try {
+				prezzo=input.nextDouble();
+				controllo=false;
+			}catch(InputMismatchException e) {
+				input.next();
+				System.out.println("Formato non valido.");
+				System.out.println("Inserisci un nuovo prezzo.");
+				System.out.println("Usare la virgola per dividere le unità dai decimali");
+			}
+				
+			}while(controllo);
 			System.out.println("Inserisci il tempo di consegna (numero di giorni): ");
+			boolean verifica=true;
+			do {
+			try {
 			int tempiconsegna=input.nextInt();
 			nuovoannuncio= new AcquistoDiretto (descrizione, now, prezzo, tempiconsegna);
 			v.add(nuovoannuncio);
 			modifica=true; // modifica non salvata
+			verifica=false;
 			System.out.println("Hai creato un nuovo annuncio");
 			System.out.println("");
+			}catch(InputMismatchException e) {
+				input.next();
+				System.out.println("Hai inserito un carattere non valido.");
+				System.out.println("Riprova!");
+			}
+			}while(verifica);
 		}
 		else {
 			//si è deciso in estendere la classe eccezione per migliorare la lettura del codice
@@ -128,9 +152,11 @@ public class GestioneVendite {
 	public void visualizza() {
 		
 		if (v.isEmpty()) {
+			System.out.println("");
 			System.out.println("Non è stato creato nessun annuncio. Fai tu la prima mossa!");
 			System.out.println();
 		}else {
+			System.out.println("");
 			System.out.println("Elenco degli annunci:");
 			for (Annuncio x : v) {
 			System.out.println(x);
@@ -141,6 +167,7 @@ public class GestioneVendite {
 		
 	public void visualizzaAste() {
 		boolean vuotoA=true;
+		System.out.println("");
 		System.out.println("Elenco delle aste a rialzo:");
 		for (Annuncio x:v) 
 		if (x instanceof AstaRialzo){
@@ -157,6 +184,7 @@ public class GestioneVendite {
  
 	public void visualizzaDiretti() {
 		boolean vuotoD=true;
+		System.out.println("");
 		System.out.println("Elenco degli acquisti diretti:");
 		for (Annuncio x:v) 
 			if (x instanceof AcquistoDiretto) {
@@ -172,21 +200,28 @@ public class GestioneVendite {
 	public void visualizzaAfter() {
 		boolean controllo=true;
 		Date datagiusta = null;
+		String text="";
+		String text2="";
 		boolean vuoti=true;
-		
+		System.out.println("");
+		System.out.println("Inserisci una data di scadenza in formato dd-MM-yyyy: ");
 		do {
 			try {
-			System.out.println("Inserisci una data di scadenza in formato dd-MM-yyyy: ");
 			SimpleDateFormat newformat = new SimpleDateFormat ("dd-MM-yyyy");
 			String datascadenza=input.next();
 			datagiusta=newformat.parse(datascadenza);
+			SimpleDateFormat outputdate= new SimpleDateFormat("EEEE dd MMMM yyyy");
+			SimpleDateFormat outputhour= new SimpleDateFormat("HH:mm");
+			text = outputdate.format(datagiusta);
+			text2=  " alle ore: " + outputhour.format(datagiusta);
 			controllo=false;
 			}
 			catch (ParseException e) {
 				System.out.println("Impossibile ricavare una data valida dal formato inserito");
+				System.out.println("Inserisci una data di scadenza in un formato valido (es.: 02-05-2020)");
 			}
 		}while (controllo);
-	System.out.println("Ecco gi annunci dopo "+ datagiusta+":");
+	System.out.println("Ecco gi annunci dopo "+ text+text2+":");
 	for (Annuncio x:v) 
 		if (x.getdata().after(datagiusta)) {
 			System.out.println(x);
@@ -194,13 +229,14 @@ public class GestioneVendite {
 			vuoti=false;
 		}
 		if(vuoti)
-			System.out.println("Non ci sono aste al rialzo dopo "+ datagiusta);
+			System.out.println("Non ci sono aste al rialzo dopo "+ text+text2);
 			System.out.println();
 	}
 
-	
+	//metodo per la visualizzazione delle aste scadute
 	public void visualizzascadute() {
 		boolean vuote=true;
+		System.out.println("");
 		for (Annuncio x:v) {
 			if (x instanceof AstaRialzo) {
 				if (((AstaRialzo) x).getdatascadenza().before(now)) {
@@ -213,12 +249,72 @@ public class GestioneVendite {
 			if(vuote) {
 				System.out.println("Non ci sono aste scadute");
 				System.out.println();
-			
 			}
 		}
 	
-	public void rimuoviannuncio() {
+	//metodo per la rimozione di un annuncio Acquisto Diretto
+	public void rimuovidiretto() {
 		boolean empty=true;
+		System.out.println("");
+		//creo un array della stessa dimensione del vettore
+				//l'array mi serve per storare gli indici di posizione delle aste scadute
+				//seguendo un indice sequenziale, utile alla loro eliminazione
+				int[] posizioni = new int [v.size()];
+				int contatore=0;
+				System.out.println("Questi sono gli Acquisti diretti disponibili:");
+				System.out.println("");
+				for (int i=0; i<v.size();i++) {
+					if (v.get(i) instanceof AcquistoDiretto) {
+							System.out.print(contatore + "- ");
+							System.out.println(v.get(i));
+							System.out.println("");
+							empty=false;
+							// creo un array che come indice ha un contatore che avanza man mano che trova delle aste scadute
+							// l'array memorizza, ogni volta che trova un'asta scaduta, la posizione che la relativa asta aveva sul vettore
+							// in questo modo ho un array che ordina sequenzialmente le posizioni delle aste scadute sul vettore
+							posizioni[contatore]=i;
+							contatore++;
+					}
+				}
+				if(!empty) {
+				boolean bandierina=true;
+				System.out.println("Quale annuncio vuoi acquistare?");
+				do {
+					try {
+				int elenco=input.nextInt();
+				// se il numero inserito è maggiore del contatore (cioè dell'indice dell'ultimo elemento inserito nell'array), getto l'eccezione
+				if(elenco>contatore) throw new ErroreIndice("Errore nella digitazione dell'indice");
+				else {
+					bandierina=false;
+					System.out.println("Complimenti! Hai acquistato: "+ v.get(posizioni[elenco]).getdescrizione());
+					// stampo i tempi di consegna per l'acquisto fatto
+					System.out.print("Per l'acquisto effettuato sono necessari ");
+					System.out.print(((AcquistoDiretto) v.get(posizioni[elenco])).gettempiconsegna());
+					System.out.println(" giorni.");
+					// rimuovo l'annuncio nella posizione "elenco" dell'array
+					v.remove(posizioni[elenco]);
+				}
+					}catch (ErroreIndice e) {
+						input.next();
+						System.out.print(e.getMessage());
+						System.out.println("Digita il numero dell'annuncio che vuoi eliminare: ");
+					}
+					catch (InputMismatchException e) {
+						System.out.println("Non hai inserito un carattere valido.");
+						System.out.println("Digita il numero dell'annuncio che vuoi eliminare:");
+					}
+				}while(bandierina);
+				}else {
+					System.out.println("Non ci sono Aquisti Diretti diponibili");
+					System.out.println();
+				}
+	}
+	
+	//metodo per l'eliminazione di un annuncio Asta al Rialzo
+	public void rimuoviannuncio() {
+		//variabile utile a capire se il vettore è vuoto
+		boolean empty=true;
+		System.out.println("");
 		//creo un array della stessa dimensione del vettore
 		//l'array mi serve per storare gli indici di posizione delle aste scadute
 		//seguendo un indice sequenziale, utile alla loro eliminazione
@@ -250,21 +346,26 @@ public class GestioneVendite {
 		// se il numero inserito è maggiore del contatore (cioè dell'indice dell'ultimo elemento inserito nell'array), getto l'eccezione
 		if(elenco>contatore) throw new ErroreIndice("Errore nella digitazione dell'indice");
 		else {
-			// rimuovo l'annuncio nella posizione "elenco" dell'array
-			v.remove(posizioni[elenco]);
 			bandierina=false;
 			// stampo il nome dell'ultimo offerente
 			System.out.print("Il nome dell'ultimo offerente è: ");
-			System.out.println(((AstaRialzo) v.get(posizioni[elenco])).getultimoorente());
+			System.out.println(((AstaRialzo) v.get(posizioni[elenco])).getultimoofferente());
+			// rimuovo l'annuncio nella posizione "elenco" dell'array
+			v.remove(posizioni[elenco]);
 		}
 			}catch (ErroreIndice e) {
 				input.next();
 				System.out.print(e.getMessage());
 				System.out.println("Digita il numero dell'annuncio che vuoi eliminare: ");
 			}
+			catch (InputMismatchException e) {
+				input.next();
+				System.out.println("Non hai inserito un carattere valido.");
+				System.out.println("Digita il numero dell'annuncio che vuoi eliminare:");
+			}
 		}while(bandierina);
 		}else {
-			System.out.println("Non ci sono ascte scadute");
+			System.out.println("Non ci sono aste scadute");
 			System.out.println();
 		}	
 		}
@@ -273,6 +374,7 @@ public class GestioneVendite {
 		boolean empty=true;
 		int[] posizioni = new int [v.size()];
 		int contatore=0;
+		System.out.println("");
 		System.out.println("Queste sono le aste ancora aperte:");
 		System.out.println("");
 		for (int i=0; i<v.size();i++) {
@@ -331,7 +433,8 @@ public class GestioneVendite {
 			}
 			catch (InputMismatchException e) {
 				input.next();
-				System.out.println("Carattere inserito non valido");
+				System.out.println("Non hai inserito un carattere valido.");
+				System.out.println("Digita il numero dell'annuncio che vuoi eliminare:");
 			}	
 		}while(bandierina);
 		}else {
