@@ -47,22 +47,23 @@ public class MainProva {
 			//come ad esempio il controllo dell'user
 			//per andare direttamente alla creazione dell'utente
 			utenti.add(mymenu.creautente());
-			
-			//salva il vettore nel file
-			try {
-				ObjectOutputStream files_output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("Utente.dat")));
-				// salva l'intero vettore nel file
-				files_output.writeObject(utenti);
-				files_output.close();
-			} catch (IOException e) {
-				System.out.println("ERRORE di I/O");
-				System.out.println(e);
-			}
-			
-			//una volta che l'utente viene creato, si procede alla fase di autenticazione
-			mymenu.ingresso(utenti);
+					//salva il vettore nel file
+					try {
+						ObjectOutputStream files_output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("Utente.dat")));
+						// salva l'intero vettore nel file
+						files_output.writeObject(utenti);
+						files_output.close();
+					} catch (IOException e) {
+						System.out.println("ERRORE di I/O");
+						System.out.println(e);
+					}
+						
+						//una volta che l'utente viene creato, si procede alla fase di autenticazione
+						mymenu.ingresso(utenti);
 		}
 		
-	input.close();
-	}	
+		
+		input.close();
+	}
 }
+
